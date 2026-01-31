@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'config/boot'
-require 'poko_rails'
+require_relative 'config/environment'
 
-run PokoRails::Application.new
+run PokoRails.application
+
+# PokoRails.application.load_server

@@ -1,29 +1,70 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative "../config/boot"
-require "optparse"
-require "poko_rails"
-require "rackup"
+require_relative '../config/boot'
+require 'optparse'
+require 'rackup'
 
-command = ARGV.shift || "server"
+command = ARGV.shift || 'server'
 
 case command
-when "server"
-  host = "127.0.0.1"
+when 'server'
+  host = '127.0.0.1'
   port = 9292
+  env = ENV['RACK_ENV'] || 'development'
+  using = nil
+  config = File.expand_path('../config.ru', __dir__)
 
   OptionParser.new do |opts|
-    opts.on("-b", "--binding HOST", "bind host (default: 127.0.0.1)") { |v| host = v }
-    opts.on("-p", "--port PORT", Integer, "port (default: 9292)") { |v| port = v }
+    opts.on('-b', '--binding HOST', 'bind host (default: 127.0.0.1)') { |v| host = v }
+    opts.on('-p', '--port PORT', Integer, 'port (default: 9292)') { |v| port = v }
+    opts.on('-e', '--environment ENV', 'rack env (default: development)') { |v| env = v }
+    opts.on('-u', '--using SERVER', 'server handler (e.g. puma)') { |v| using = v }
   end.parse!(ARGV)
 
-  app = PokoRails::Application.new
+  options = {
+    Host: host,
+    Port: port,
+    environment: env,
+    config: config
+  }
+  options[:server] = using if using
 
-  handler = Rackup::Handler.get("puma") || Rackup::Handler.default
-  handler.run(app, Host: host, Port: port)
+  puts 'Booting Poko Rails...'
+  print '
+           .%%+@=
+          *#----@                 #%+++%
+         #=-----*%              +%-----@
+        %--.  *==@.            %+-*=---@
+      .@=-    -+-@-           @+-#+  .-@
+      %=-:    .@-#=          #*-**   .-%:
+     *#-.  .=  @=+#         *#-**    .-#+
+    .%--.   =% %+-#        .%-=#-*+  .-#*
+    #+---  +@-:**-+%@@@@@@%%*=@::.++  -*#
+    @=-----------------------=-:.   .--=%
+   .%+-------------------------==------=@+
+  :%--------#@%@=----:.:----+@@=+%-------=@=
+ .@+-------%:@@:%---    ---%:%@@.=#--------##
+ **-------%=.@@.-@-     --*#.@@@..%=--------#*
+.@--------==+%+.-@-   : :--.:%*:..+---------=@.
+-%-====-------=*.        :::-===----===------@:
+-%-----=*####%+               ***#*+---==----@:
+ @=---------         ##=     -::  .---------=%
+ #+----=*@@@#   %:  @=:*#   -%=*%#--=-------*#
+ :@-+@*----       =#@=---*%#        :=*=----%:
+  -@#------.         @----%         .------%+
+   :@+------         =%:-:%         :-----%+
+     =@=-----         .#%%.        :----=@-
+       -@%=---:                   -----*@:
+          -#@%+=-             :------=@#
+               -=*%@@%*+-:--====+#%@@+
+                         -+*+-.
+
+'
+  # 内部でwrapped_appを作る
+  Rackup::Server.new(options).start
 else
   warn "Unknown command: #{command}"
-  warn "Usage: bin/poko-rails server [-b HOST] [-p PORT]"
+  warn 'Usage: bin/poko-rails server [-b HOST] [-p PORT]'
   exit 1
 end
