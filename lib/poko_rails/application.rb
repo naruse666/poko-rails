@@ -3,7 +3,6 @@
 module PokoRails
   class Application
     def call(env)
-      puts env
       [
         200,
         {

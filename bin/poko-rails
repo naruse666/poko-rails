@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../config/boot"
+require "optparse"
+require "poko_rails"
+require "rackup"
+
+command = ARGV.shift || "server"
+
+case command
+when "server"
+  host = "127.0.0.1"
+  port = 9292
+
+  OptionParser.new do |opts|
+    opts.on("-b", "--binding HOST", "bind host (default: 127.0.0.1)") { |v| host = v }
+    opts.on("-p", "--port PORT", Integer, "port (default: 9292)") { |v| port = v }
+  end.parse!(ARGV)
+
+  app = PokoRails::Application.new
+
+  handler = Rackup::Handler.get("puma") || Rackup::Handler.default
+  handler.run(app, Host: host, Port: port)
+else
+  warn "Unknown command: #{command}"
+  warn "Usage: bin/poko-rails server [-b HOST] [-p PORT]"
+  exit 1
+end
