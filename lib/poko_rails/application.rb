@@ -2,18 +2,16 @@
 
 module PokoRails
   class Application
-    def call(env)
-      [
-        200,
-        {
-          'content-type' => 'text/plain; charset=utf-8'
-        },
-        ["poko-rails: hello\n"]
-      ]
-    end
-
     def routes
       @routes ||= RouteSet.new
+    end
+
+    def router
+      @router ||= Router.new(routes)
+    end
+
+    def call(env)
+      router.call(env)
     end
   end
 end
