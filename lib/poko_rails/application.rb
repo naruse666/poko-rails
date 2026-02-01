@@ -11,5 +11,9 @@ module PokoRails
         ["poko-rails: hello\n"]
       ]
     end
+
+    def routes
+      @routes ||= RouteSet.new
+    end
   end
 end
