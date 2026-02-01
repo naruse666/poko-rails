@@ -13,7 +13,7 @@ module PokoRails
       self # メソッドチェーンを可能にするself
     end
 
-    def get(path, to)
+    def get(path, to:)
       @routes << Route.new(http_method: 'GET', path: path, to: to)
       self
     end
