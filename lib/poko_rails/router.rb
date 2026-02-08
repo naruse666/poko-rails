@@ -11,7 +11,7 @@ module PokoRails
       path = env['PATH_INFO']
 
       route = @route_set.routes.find do |r|
-        r.http_method == method && r.path == path
+        r.http_method == method && r.pattern.match?(path)
       end
       return not_found if route.nil?
 
