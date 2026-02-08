@@ -20,10 +20,11 @@ module PokoRails
 
       controller = controller_class.new(env)
       controller.process(action_name)
-    rescue NameError, NoMethodError => e
-      puts "#{e}"
+    rescue NameError
       # controllerが見つからない/actionがない
       not_found
+    rescue StandardError => e
+      internal_error(e)
     end
 
     private
@@ -37,6 +38,12 @@ module PokoRails
       [
         404, { 'content-type' => 'text/plain; charset=utf-8' }, ["Not Found\n"]
       ]
+    end
+
+    def internal_error(e)
+      body = +"Internal Server Error\n"
+      body << "#{e.class}: #{e.message}\n"
+      [500, { 'content-type' => 'text/plain; charset=utf-8' }, [body]]
     end
   end
 end
