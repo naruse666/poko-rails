@@ -18,13 +18,8 @@ module PokoRails
       controller_name, action_name = route.to.split('#', 2)
       controller_class = controller_class_for(controller_name)
 
-      controller = controller_class.new
-      puts controller
-      body = controller.public_send(action_name)
-
-      [
-        200, { 'content-type' => 'text/plain; charset=utf-8' }, [body.to_s]
-      ]
+      controller = controller_class.new(env)
+      controller.process(action_name)
     rescue NameError, NoMethodError => e
       puts "#{e}"
       # controllerが見つからない/actionがない

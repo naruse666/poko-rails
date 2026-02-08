@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class HomeController
+class HomeController < PokoRails::Controller
   def index
-    "home\n"
+    render plain: "home\n"
   end
 end
