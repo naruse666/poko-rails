@@ -2,6 +2,6 @@
 
 class UsersController < PokoRails::Controller
   def show
-    render plain: "users#show\n"
+    render plain: "id=#{params['id']}\n"
   end
 end

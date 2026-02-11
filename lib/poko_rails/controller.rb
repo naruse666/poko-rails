@@ -1,13 +1,24 @@
 # frozen_string_literal: true
 
+require 'rack/request'
+
 module PokoRails
   class Controller
-    def initialize(env)
+    def initialize(env, path_params = {})
       @env = env
+      @request = Rack::Request.new(env)
+
+      @path_params = stringify_keys(path_params)
+
       @status = 200
       @headers = { 'content-type' => 'text/plain; charset=utf-8' }
       @body_parts = []
-      @rendered = false
+    end
+
+    attr_reader :request
+
+    def params
+      @path_params.dup
     end
 
     def process(action_name)
@@ -23,8 +34,13 @@ module PokoRails
       @status = status
       @headers['content-type'] = content_type
       @body_parts = [plain.to_s]
-      @rendered = true
       nil
+    end
+
+    private
+
+    def stringify_keys(h)
+      h.each_with_object({}) { |(k, v), acc| acc[k.to_s] = v }
     end
   end
 end

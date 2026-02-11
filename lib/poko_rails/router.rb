@@ -10,15 +10,13 @@ module PokoRails
       method = env['REQUEST_METHOD']
       path = env['PATH_INFO']
 
-      route = @route_set.routes.find do |r|
-        r.http_method == method && r.pattern.match?(path)
-      end
+      route, path_params = find_route(method, path)
       return not_found if route.nil?
 
       controller_name, action_name = route.to.split('#', 2)
       controller_class = controller_class_for(controller_name)
 
-      controller = controller_class.new(env)
+      controller = controller_class.new(env, path_params)
       controller.process(action_name)
     rescue NameError
       # controllerが見つからない/actionがない
@@ -28,6 +26,20 @@ module PokoRails
     end
 
     private
+
+    def find_route(method, path)
+      @route_set.routes.find do |r|
+        next unless r.http_method == method
+
+        m = r.pattern.match(path)
+        next unless m
+
+        params = {}
+        r.param_names.each_with_index { |name, idx| params[name] = m.captures[idx] }
+        return [r, params]
+      end
+      [nil, {}]
+    end
 
     def controller_class_for(controller_name)
       klass = "#{Inflector.camelize(controller_name)}Controller"
