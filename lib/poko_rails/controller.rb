@@ -18,7 +18,7 @@ module PokoRails
     attr_reader :request
 
     def params
-      @path_params.dup
+      @request.params.merge(@path_params)
     end
 
     def process(action_name)
