@@ -2,6 +2,12 @@
 
 class UsersController < PokoRails::Controller
   def show
-    render plain: "id=#{params['id']}, q=#{params['q']}\n"
+    p = []
+    p << "id=#{params['id']}" if params.has_key? 'id'
+    p << "q=#{params['q']}" if params.has_key? 'q'
+
+    res = p.join(', ')
+    puts res
+    render plain: "#{res}\n"
   end
 end
