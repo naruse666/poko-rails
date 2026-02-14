@@ -28,7 +28,11 @@ module PokoRails
     # '/users/:id' -> [/^\/users\/([^\/]+)$/, ["id"]]
     def compile(path)
       names = []
-      regex = path.split('/').map do |seg|
+
+      rest = path.sub(%r{\A/}, '')
+      segments = rest.empty? ? [] : rest.split('/')
+
+      regex = segments.map do |seg|
         if seg.start_with?(':')
           names << seg.delete_prefix(':')
           '([^/]+)'
@@ -37,7 +41,8 @@ module PokoRails
         end
       end.join('/')
 
-      [Regexp.new("^#{regex}$"), names]
+      pattern = regex.empty? ? %r{\A/\z} : Regexp.new("^/#{regex}$")
+      [pattern, names]
     end
   end
 end
