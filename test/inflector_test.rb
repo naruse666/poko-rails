@@ -14,4 +14,14 @@ class InflectorTest < Minitest::Test
   def test_underscore_acronym_like
     assert_equal 'html_parser', PokoRails::Inflector.underscore('HTMLParser')
   end
+
+  def test_demodulize
+    assert_equal 'UsersController', PokoRails::Inflector.demodulize('Admin::UsersController')
+    assert_equal 'UsersController', PokoRails::Inflector.demodulize('UsersController')
+  end
+
+  def test_deconstantize
+    assert_equal 'Admin', PokoRails::Inflector.deconstantize('Admin::UsersController')
+    assert_equal '', PokoRails::Inflector.deconstantize('UsersController')
+  end
 end

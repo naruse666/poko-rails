@@ -38,5 +38,16 @@ module PokoRails
       word.downcase!
       word
     end
+
+    def demodulize(const_name)
+      const_name.to_s.split('::').last
+    end
+
+    def deconstantize(const_name)
+      parts = const_name.to_s.split('::')
+      return '' if parts.length <= 1
+
+      parts[0...-1].join('::')
+    end
   end
 end
