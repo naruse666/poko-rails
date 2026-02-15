@@ -21,5 +21,22 @@ module PokoRails
     def constantize(name)
       name.split('::').inject(Object) { |mod, const| mod.const_get(const) }
     end
+
+    def underscore(camel_cased_word)
+      word = camel_cased_word.to_s.dup
+
+      # "Admin::UsersController" -> "Admin/UsersController"
+      word.gsub!('::', '/')
+
+      # "UsersController" -> "Users_Controller"
+      word.gsub!(/([A-Z\d]+)([A-Z][a-z])/, '\1_\2')
+
+      # "UsersController" -> "Users_Controller" 追加分割: "sC"等
+      word.gsub!(/([a-z\d])([A-Z])/, '\1_\2')
+
+      word.tr!('-', '_')
+      word.downcase!
+      word
+    end
   end
 end
