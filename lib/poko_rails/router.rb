@@ -15,12 +15,10 @@ module PokoRails
 
       controller_name, action_name = route.to.split('#', 2)
       controller_class = controller_class_for(controller_name)
+      return not_found unless controller_class
 
       controller = controller_class.new(env, path_params)
       controller.process(action_name)
-    rescue NameError
-      # controllerが見つからない/actionがない
-      not_found
     rescue StandardError => e
       internal_error(e)
     end
@@ -43,7 +41,7 @@ module PokoRails
 
     def controller_class_for(controller_name)
       klass = "#{Inflector.camelize(controller_name)}Controller"
-      Inflector.constantize(klass)
+      Inflector.safe_constantize(klass)
     end
 
     def not_found

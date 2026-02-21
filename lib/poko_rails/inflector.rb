@@ -22,6 +22,12 @@ module PokoRails
       name.split('::').inject(Object) { |mod, const| mod.const_get(const) }
     end
 
+    def safe_constantize(name)
+      constantize(name)
+    rescue NameError
+      nil
+    end
+
     def underscore(camel_cased_word)
       word = camel_cased_word.to_s.dup
 

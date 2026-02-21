@@ -24,4 +24,9 @@ class InflectorTest < Minitest::Test
     assert_equal 'Admin', PokoRails::Inflector.deconstantize('Admin::UsersController')
     assert_equal '', PokoRails::Inflector.deconstantize('UsersController')
   end
+
+  def test_safe_constantize
+    assert_equal String, PokoRails::Inflector.safe_constantize('String')
+    assert_nil PokoRails::Inflector.safe_constantize('NoSuchConst1234')
+  end
 end
