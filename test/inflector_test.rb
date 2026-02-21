@@ -29,4 +29,19 @@ class InflectorTest < Minitest::Test
     assert_equal String, PokoRails::Inflector.safe_constantize('String')
     assert_nil PokoRails::Inflector.safe_constantize('NoSuchConst1234')
   end
+
+  def test_pluralize_and_singularize_basic
+    assert_equal 'users', PokoRails::Inflector.pluralize('user')
+    assert_equal 'user', PokoRails::Inflector.singularize('users')
+  end
+
+  def test_pluralize_and_singularize_ies
+    assert_equal 'companies', PokoRails::Inflector.pluralize('company')
+    assert_equal 'company', PokoRails::Inflector.singularize('companies')
+  end
+
+  def test_pluralize_and_singularize_irregular
+    assert_equal 'people', PokoRails::Inflector.pluralize('person')
+    assert_equal 'person', PokoRails::Inflector.singularize('people')
+  end
 end

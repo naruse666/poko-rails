@@ -55,5 +55,37 @@ module PokoRails
 
       parts[0...-1].join('::')
     end
+
+    def irregulars
+      @irregulars ||= {
+        'person' => 'people',
+        'child' => 'children'
+      }
+    end
+
+    def pluralize(word)
+      w = word.to_s
+      return irregulars[w] if irregulars.key?(w)
+
+      inv = irregulars.invert
+      return inv[w] if inv.key?(w) # 複数形が渡された時の逆引き
+
+      return w if w.end_with?('s') # 最小実装 すでに複数ぽいならそのまま
+      return w.sub(/y\z/, 'ies') if w.match?(/[^aeiou]y\z/)
+
+      "#{w}s"
+    end
+
+    def singularize(word)
+      w = word.to_s
+      inv = irregulars.invert
+      return inv[w] if inv.key?(w)
+      return irregulars.key(w) if irregulars.value?(w)
+
+      return w.sub(/ies\z/, 'y') if w.end_with?('ies')
+      return w.sub(/s\z/, '') if w.end_with?('s') && w.size > 1
+
+      w
+    end
   end
 end
