@@ -44,4 +44,12 @@ class InflectorTest < Minitest::Test
     assert_equal 'people', PokoRails::Inflector.pluralize('person')
     assert_equal 'person', PokoRails::Inflector.singularize('people')
   end
+
+  def test_controller_path_and_name
+    assert_equal 'users', PokoRails::Inflector.controller_path('UsersController')
+    assert_equal 'users', PokoRails::Inflector.controller_name('UsersController')
+
+    assert_equal 'admin/users', PokoRails::Inflector.controller_path('Admin::UsersController')
+    assert_equal 'users', PokoRails::Inflector.controller_name('Admin::UsersController')
+  end
 end

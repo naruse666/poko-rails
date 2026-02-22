@@ -4,6 +4,17 @@ module PokoRails
   module Inflector
     module_function
 
+    def controller_path(klass_or_name)
+      name = klass_or_name.is_a?(Class) ? klass_or_name.name : klass_or_name.to_s
+      # "Admin::UsersController" -> "admin/users_controller"
+      underscored = underscore(name)
+      underscored.sub(/_controller\z/, '')
+    end
+
+    def controller_name(klass_or_name)
+      controller_path(klass_or_name).split('/').last
+    end
+
     # "home" -> "Home"
     # "admin/users" -> "Admin::Users"
     def camelize(pathish)
