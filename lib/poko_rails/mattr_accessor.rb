@@ -11,12 +11,12 @@ module PokoRails
         mod.instance_variable_set(ivar, default) unless mod.instance_variable_defined?(ivar)
 
         # module reader
-        mod.define_singleton_mehotd(name) do
+        mod.define_singleton_method(name) do
           mod.instance_variable_get(ivar)
         end
 
         # module writer
-        mod.define_singleton_mehotd("#{name}=") do |val|
+        mod.define_singleton_method("#{name}=") do |val|
           mod.instance_variable_set(ivar, val)
         end
       end

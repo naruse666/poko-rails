@@ -9,7 +9,7 @@ module PokoRails
         cvar = :"@@#{name}"
 
         # 初期値
-        klass.class_variable_set(cvar, default) unless klass.class_variable_define?(cvar)
+        klass.class_variable_set(cvar, default) unless klass.class_variable_defined?(cvar)
 
         # class reader
         klass.define_singleton_method(name) do
