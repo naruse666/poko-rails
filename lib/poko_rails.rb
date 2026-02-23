@@ -7,6 +7,7 @@ require 'poko_rails/router'
 require 'poko_rails/routing'
 require 'poko_rails/class_attribute'
 require 'poko_rails/cattr_accessor'
+require 'poko_rails/mattr_accessor'
 
 # require 'rack'
 # require 'rack/request'
