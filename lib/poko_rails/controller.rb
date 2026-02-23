@@ -24,7 +24,9 @@ module PokoRails
     def process(action_name)
       return [404, { 'content-type' => 'text/plain; charset=utf-8' }, ["Not Found\n"]] unless respond_to?(action_name)
 
-      public_send(action_name)
+      Notifications.instrument('controller.process', controller: self.class.name, action: action_name) do
+        public_send(action_name)
+      end
 
       # actionがrenderを呼ばない場合でもRack互換で返す
       [@status, @headers, @body_parts.empty? ? [''] : @body_parts]

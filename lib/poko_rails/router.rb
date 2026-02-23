@@ -10,15 +10,24 @@ module PokoRails
       method = env['REQUEST_METHOD']
       path = env['PATH_INFO']
 
-      route, path_params = find_route(method, path)
+      route, path_params = Notifications.instrument('router.match', method: method, path: path) do |payload|
+        r, p = find_route(method, path)
+
+        payload[:matched] = !r.nil?
+        payload[:to] = r&.to
+        [r, p]
+      end
       return not_found if route.nil?
 
       controller_name, action_name = route.to.split('#', 2)
       controller_class = controller_class_for(controller_name)
       return not_found unless controller_class
 
-      controller = controller_class.new(env, path_params)
-      controller.process(action_name)
+      Notifications.instrument('router.dispatch', method: method, path: path, to: route.to,
+                                                  controller: controller_class.name, action: action_name) do
+        controller = controller_class.new(env, path_params)
+        controller.process(action_name)
+      end
     rescue StandardError => e
       internal_error(e)
     end
