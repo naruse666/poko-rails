@@ -10,6 +10,7 @@ require 'poko_rails/cattr_accessor'
 require 'poko_rails/mattr_accessor'
 require 'poko_rails/notifications'
 require 'poko_rails/log_subscriber'
+require 'poko_rails/blank'
 
 # require 'rack'
 # require 'rack/request'
