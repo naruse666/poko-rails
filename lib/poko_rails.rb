@@ -12,6 +12,7 @@ require 'poko_rails/notifications'
 require 'poko_rails/log_subscriber'
 require 'poko_rails/blank'
 require 'poko_rails/try'
+require 'poko_rails/hash_ext'
 
 # require 'rack'
 # require 'rack/request'
