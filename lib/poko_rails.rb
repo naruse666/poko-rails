@@ -9,6 +9,7 @@ require 'poko_rails/class_attribute'
 require 'poko_rails/cattr_accessor'
 require 'poko_rails/mattr_accessor'
 require 'poko_rails/notifications'
+require 'poko_rails/log_subscriber'
 
 # require 'rack'
 # require 'rack/request'

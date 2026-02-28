@@ -5,3 +5,5 @@ require_relative 'application'
 
 Dir[File.expand_path('../app/controllers/**/*.rb', __dir__)].sort.each { |f| require f }
 require_relative 'routes'
+
+PokoRails::LogSubscriber.attach! if (ENV['RACK_ENV'] || 'development') == 'development'
