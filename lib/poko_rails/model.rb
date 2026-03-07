@@ -8,12 +8,18 @@ module PokoRails
       attr_writer :db
 
       def db
-        @db || raise('PokoRails::Model.db is not set')
+        if instance_variable_defined?(:@db)
+          @db
+        elsif superclass.respond_to?(:db)
+          superclass.db
+        else
+          raise('PokoRails::Model.db is not set')
+        end
       end
 
       def table_name
         # User -> user -> users
-        base = Inflector.underscore(name)
+        base = Inflector.underscore(Inflector.demodulize(name))
         Inflector.pluralize(base)
       end
 
@@ -22,23 +28,51 @@ module PokoRails
         row = rows.first
         raise RecordNotFound, "Couldn't find #{name} with id=#{id}" unless row
 
-        new(row)
+        new(filter_row(row))
       end
 
-      def initialize(attrs = {})
-        # sqlite3 results_as_hash=true の行は 0,1,... の数値キーも含むので除外
-        @attributest = attrs.each_with_object({}) do |(k, v), acc|
+      def where(conditions = {})
+        raise ArgumentError, 'where expects a Hash' unless conditions.is_a?(Hash)
+
+        sql = +"SELECT * FROM #{table_name}"
+        binds = []
+
+        if conditions.any?
+          clauses = conditions.map do |k, v|
+            binds << v
+            "#{k} = ?"
+          end
+          sql << ' WHERE ' << clauses.join(' AND ')
+        end
+
+        rows = db.execute(sql, binds)
+        rows.map { |row| new(filter_row(row)) }
+      end
+
+      private
+
+      def filter_row(row)
+        row.each_with_object({}) do |(k, v), acc|
           next if k.is_a?(Integer)
 
           acc[k.to_s] = v
         end
       end
+    end
 
-      attr_reader :attributes
+    def initialize(attrs = {})
+      # sqlite3 results_as_hash=true の行は 0,1,... の数値キーも含むので除外
+      @attributest = attrs.each_with_object({}) do |(k, v), acc|
+        next if k.is_a?(Integer)
 
-      def [](key)
-        @attributest[key.to_s]
+        acc[k.to_s] = v
       end
+    end
+
+    attr_reader :attributes
+
+    def [](key)
+      @attributest[key.to_s]
     end
   end
 end
