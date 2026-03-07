@@ -14,6 +14,7 @@ require 'poko_rails/blank'
 require 'poko_rails/try'
 require 'poko_rails/hash_ext'
 require 'poko_rails/database'
+require 'poko_rails/model'
 
 # require 'rack'
 # require 'rack/request'
