@@ -55,6 +55,16 @@ module PokoRails
         obj
       end
 
+      def validations
+        @validations ||= []
+      end
+
+      def validates(attr, presence: false)
+        return unless presence
+
+        validations << { type: :presence, attr: attr.to_s }
+      end
+
       private
 
       def filter_row(row)
@@ -90,12 +100,35 @@ module PokoRails
     end
 
     def save
+      return false unless valid?
+
       if id.nil?
         insert!
       else
         update!
       end
       true
+    end
+
+    def errors
+      @errors ||= {}
+    end
+
+    def add_error(attr, message)
+      key = attr.to_s
+      (errors[key] ||= []) << message
+    end
+
+    def valid?
+      errors.clear
+      self.class.validations.each do |v|
+        case v[:type]
+        when :presence
+          val = self[v[:attr]]
+          add_error(v[:attr], "can't be blank") if val.nil? || (val.respond_to?(:empty?) && val.empty?)
+        end
+      end
+      errors.empty?
     end
 
     private
