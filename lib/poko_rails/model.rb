@@ -4,6 +4,8 @@ module PokoRails
   class RecordNotFound < StandardError; end
 
   class Model
+    PokoRails::ClassAttribute.define(self, :validations, default: [])
+
     class << self
       attr_writer :db
 
@@ -55,14 +57,13 @@ module PokoRails
         obj
       end
 
-      def validations
-        @validations ||= []
-      end
-
       def validates(attr, presence: false)
         return unless presence
 
-        validations << { type: :presence, attr: attr.to_s }
+        current = validations
+        current = current.dup
+        current << { type: :presence, attr: attr.to_s }
+        self.validations = current
       end
 
       private
