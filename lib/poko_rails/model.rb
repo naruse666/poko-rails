@@ -49,6 +49,12 @@ module PokoRails
         rows.map { |row| new(filter_row(row)) }
       end
 
+      def create(attrs = {})
+        obj = new(attrs)
+        obj.save
+        obj
+      end
+
       private
 
       def filter_row(row)
@@ -62,7 +68,7 @@ module PokoRails
 
     def initialize(attrs = {})
       # sqlite3 results_as_hash=true の行は 0,1,... の数値キーも含むので除外
-      @attributest = attrs.each_with_object({}) do |(k, v), acc|
+      @attributes = attrs.each_with_object({}) do |(k, v), acc|
         next if k.is_a?(Integer)
 
         acc[k.to_s] = v
@@ -72,7 +78,52 @@ module PokoRails
     attr_reader :attributes
 
     def [](key)
-      @attributest[key.to_s]
+      @attributes[key.to_s]
+    end
+
+    def []=(key, value)
+      @attributes[key.to_s] = value
+    end
+
+    def id
+      self['id']
+    end
+
+    def save
+      if id.nil?
+        insert!
+      else
+        update!
+      end
+      true
+    end
+
+    private
+
+    def insert!
+      cols = @attributes.keys.reject { |k| k == 'id' }
+      vals = cols.map { |c| @attributes[c] }
+
+      if cols.empty?
+        self.class.db.execute("INSERT INTO #{self.class.table_name} DEFAULT FALUES")
+      else
+        placeholders = (['?'] * cols.size).join(', ')
+        sql = "INSERT INTO #{self.class.table_name} (#{cols.join(', ')}) VALUES (#{placeholders})"
+        self.class.db.execute(sql, vals)
+      end
+
+      # sqliteのlast_insert_rowidをget
+      row = self.class.db.execute('SELECT last_insert_rowid() AS id').first
+      @attributes['id'] = row['id']
+    end
+
+    def update!
+      cols = @attributes.keys.reject { |k| k == 'id' }
+      vals = cols.map { |c| @attributes[c] }
+
+      set_clause = cols.map { |c| "#{c} = ?" }.join(', ')
+      sql = "UPDATE #{self.class.table_name} SET #{set_clause} WHERE id = ?"
+      self.class.db.execute(sql, vals + [id])
     end
   end
 end
